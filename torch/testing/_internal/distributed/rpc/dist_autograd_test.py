@@ -1,7 +1,6 @@
 import sys
 import threading
 import time
-import unittest
 from enum import Enum
 import random
 import torch
@@ -14,7 +13,7 @@ import torch.testing._internal.dist_utils
 from torch.autograd import Function
 from torch.autograd.function import once_differentiable
 from torch.distributed.rpc import RRef
-from torch.testing._internal.common_utils import IS_MACOS
+from torch.testing._internal.common_utils import IS_MACOS, sandcastle_skip_if
 from torch.testing._internal.dist_utils import (
     dist_init,
     initialize_pg,
@@ -1204,7 +1203,7 @@ class DistAutogradTest(CommonDistAutogradTest):
                 dist_autograd.backward(context_id, [val.sum()])
 
     @dist_init(clean_shutdown=False)
-    @unittest.skipIf(
+    @sandcastle_skip_if(
         IS_MACOS,
         "Test is flaky on MacOS since libuv error handling is not as robust as TCP",
     )
@@ -1426,7 +1425,7 @@ class DistAutogradTest(CommonDistAutogradTest):
     _backward_done = False
 
     @dist_init(clean_shutdown=False)
-    @unittest.skipIf(
+    @sandcastle_skip_if(
         IS_MACOS,
         "Test is flaky on MacOS since libuv error handling is not as robust as TCP",
     )
@@ -1464,8 +1463,7 @@ class DistAutogradTest(CommonDistAutogradTest):
                     dist_autograd.backward(context_id, [res.sum()])
 
                 # Mark rank 0 is done in the store, since the RPC framework on
-                # some nodes might be broken at this point (listenLoop() in
-                # ProcessGroupAgent might've exited).
+                # some nodes might be broken at this point.
                 store.set('test_backward_node_failure_python_udf_rank0_done', "True")
             else:
                 # Wait for backward to finish on rank 0.
@@ -2238,8 +2236,8 @@ class FaultyAgentDistAutogradTest(RpcAgentTestFixture):
 
     @dist_init
     def test_verify_backend_options(self):
-        self.assertEqual(self.rpc_backend, rpc.backend_registry.BackendType.FAULTY_PROCESS_GROUP)
-        self.assertEqual(self.rpc_backend_options.num_send_recv_threads, 8)
+        self.assertEqual(self.rpc_backend, rpc.backend_registry.BackendType.FAULTY_TENSORPIPE)
+        self.assertEqual(self.rpc_backend_options.num_worker_threads, 8)
         self.assertEqual(self.rpc_backend_options.num_fail_sends, 3)
         self.assertEqual(len(self.rpc_backend_options.messages_to_fail), 4)
 

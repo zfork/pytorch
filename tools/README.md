@@ -15,10 +15,6 @@ Modern infrastructure:
     to import arbitrary Python files in a script, without having to add
     them to the PYTHONPATH first.
 
-Legacy infrastructure (we should kill this):
-* [cwrap](cwrap) - Implementation of legacy code generation for THNN/THCUNN.
-  This is used by nnwrap.
-
 Build system pieces:
 
 * [setup_helpers](setup_helpers) - Helper code for searching for
@@ -37,7 +33,7 @@ Build system pieces:
 
 Developer tools which you might find useful:
 
-* [linter/clang_tidy.py](linter/clang_tidy.py) - Script for running clang-tidy
+* [linter/clang_tidy](linter/clang_tidy/__main__.py) - Script for running clang-tidy
   on lines of your script which you changed.
 * [extract_scripts.py](extract_scripts.py) - Extract scripts from
   `.github/workflows/*.yml` into a specified dir, on which linters such as
